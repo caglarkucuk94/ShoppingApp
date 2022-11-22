@@ -1,0 +1,35 @@
+﻿@using ShoppingApp.Models.Dtos
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+@model List<CategoryDto>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Kategori Adı</th>
+            <th scope="col"></th>
+            <th scope="col"></th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            int row = 0;
+        }
+        @foreach (var item in Model)
+        {
+            row++;
+            <tr>
+                <td>@row</td>
+                <td>@item.Name</td>
+                <td><a href="/Category/Edit/@item.Id">Değiştir</a></td>
+                <td><a href="/Category/DeleteCategory/@item.Id">Sil</a></td>
+            </tr>
+        }
+
+    </tbody>
+</table>
+<a href="/Category/Add" class="btn btn-info">Kategori Ekle</a>

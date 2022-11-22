@@ -1,0 +1,151 @@
+﻿@using ShoppingApp.Models.ViewModel
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+@model ProductUserListVM
+@Html.ValidationSummary(false)
+<div class="row">
+    <div class="col-7">
+        <h5>Listeye Ekli Ürünler</h5>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col"></th>
+                    <th scope="col">Ürün Adı</th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    int row = 0;
+                }
+                @foreach (var item in Model.ProductUserLists)
+                {
+                    row++;
+                    var dark = item.IsBought ? "table-dark" : null;
+                    <tr class="@dark">
+                        <td>@row</td>
+                        <td><img src="@String.Format("data:{0};base64,{1}", item.Product.ContentType, item.Product.FileBase64String.ToString())" style="width:30px;height:30px"> </td>
+                        <td>@item.Product.Name</td>
+                        @if (Model.UserList.IsShop)
+                        {
+                            @if (!item.IsBought)
+                            {
+                                <td><a href="/UserList/IsBought/@item.Id">Aldım</a></td>
+                            }
+                            else
+                            {
+                                <td></td>
+                            }
+
+                            <td></td>
+                            <td></td>
+                        }
+                        else
+                        {
+                            <td><a href="/UserList/ProductListEdit/@item.Id">Değiştir</a></td>
+                            <td><a href="/UserList/ProductListRemoveProduct/@item.Id">Kaldır</a></td>
+                        }
+                    </tr>
+
+                }
+
+            </tbody>
+        </table>
+        **Aynı üründen listeye ekleme yapamazsınız..<br />
+        @if (Model.UserList.IsShop)
+        {
+            <a href="/UserList/IsComplete/@Model.UserList.Id" class="btn btn-lg btn-success">Alışverişi Tamamladım</a>
+
+        }
+        else
+        {
+            <a href="/UserList/IsShop/@Model.UserList.Id" class="btn btn-lg btn-warning">Alışverişe Çıkıyorum</a>
+        }
+
+    </div>
+    @if (!Model.UserList.IsShop)
+    {
+        <div class="col-5" style="border:1px dashed">
+            <h5>Ürün Arama</h5>
+            <table class="table" id="productTable">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Ürün Adı</th>
+                        <th>Kategori</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Products)
+                    {
+                        <tr>
+                            <td><img src="@item.FileBase64String" style="width:20px;height:auto;" /> </td>
+                            <td>@item.Name</td>
+                            <td>@item.Category.Name</td>
+                            <td>
+                                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-whatever="@item.Id">Ekle</button>
+                            </td>
+                        </tr>
+                    }
+
+                </tbody>
+            </table>
+
+        </div>
+    }
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Listeye Ürün Ekle</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form asp-action="UserListDetail" asp-controller="UserList">
+                    <div class="mb-3">
+                        <label for="message-text" class="col-form-label">Açıklama:</label>
+                        <textarea class="form-control" asp-for="ProductUserList.Description"></textarea>
+                    </div>
+                    <input hidden asp-for="ProductUserList.UserListId" />
+                    <input type="hidden" class="form-control" asp-for="ProductUserList.ProductId">
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                        <button type="submit" class="btn btn-primary">Kaydet</button>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    var exampleModal = document.getElementById('exampleModal')
+    exampleModal.addEventListener('show.bs.modal', function (event) {
+        // Button that triggered the m
+        var button = event.relatedTarget
+        // Extract info from data-bs-* attributes
+        var productId = button.getAttribute('data-bs-whatever')
+        document.getElementById('ProductUserList_ProductId').value = productId
+    })
+</script>
+
+<script>
+    $(document).ready(function () {
+        $('#productTable').DataTable({
+            "language": {
+                "url": "//cdn.datatables.net/plug-ins/1.10.12/i18n/Turkish.json"
+            }
+        });
+    });
+</script>
